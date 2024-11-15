@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -415,5 +416,3 @@ public class GUI_for_chess_like_games extends JFrame {
         turnLabel.setText("Player 1's Turn");
     }
 }
-
-
