@@ -1,9 +1,7 @@
 import javax.swing.text.Position;
 import java.util.ArrayList;
 import java.util.List;
-
-
-public class GameLogic implements PlayableLogic{
+public class GameLogic implements PlayableLogic {
 
     private Player player1;
     private Player player2;
@@ -14,12 +12,12 @@ public class GameLogic implements PlayableLogic{
     public GameLogic() {
         // Initialize the board
         board = new Disc[BOARD_SIZE][BOARD_SIZE];
-        initializeBoard();
+        initial_Board();
     }
 
-    public void initializeBoard(){
-        for(int row = 0 ; row < 8 ; row++){
-            for (int col = 0 ; col < 8; col++){
+    public void initial_Board() {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
                 board[row][col] = null;
             }
         }
@@ -46,15 +44,21 @@ public class GameLogic implements PlayableLogic{
     public int getBoardSize() {
         return BOARD_SIZE;
     }
-// ?
+
+    // ?
     @Override
     public List<Position> ValidMoves() {
         List<Position> validMoveList = new ArrayList<>();
-        for(int row = 0 ; row < BOARD_SIZE ; row++){
-            for(int col = 0 ; col < BOARD_SIZE ; col ++){
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
                 if (board[row][col] == null) {
-                    if (board[row][col].isValidMove()) {
-                        validMoveList.add(move.getPosition());
+
+                    Position position = new Position(row, col);
+
+                    Disc tempDisc = new SimpleDisc(player1);
+
+                    if (locate_disc(position, tempDisc)) {
+                        validMoveList.add(position);
                     }
                 }
             }
@@ -98,6 +102,7 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public void reset() {
+        initial_Board();
 
     }
 
@@ -105,4 +110,5 @@ public class GameLogic implements PlayableLogic{
     public void undoLastMove() {
 
     }
+
 }

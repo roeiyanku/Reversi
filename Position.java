@@ -34,7 +34,7 @@ public class Position {
         // Method to get a hash code for the position (useful for HashMaps or HashSets)
         @Override
         public int hashCode() {
-            return 31 * row + column;
+            return 27 * row + column;
         }
 
         // Method to get a neighboring position based on direction

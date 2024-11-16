@@ -31,8 +31,6 @@ public class Move {
          return position;
     }
 
-    //add public boolean isMoveValid(Position position, Player player)
-
     @Override
     public String toString() {
             String playerType = player.isPlayerOne() ? "Player 1" : "Player 2"; // בדיקה ישירה לפי isPlayerOne
