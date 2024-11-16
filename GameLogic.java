@@ -18,6 +18,11 @@ public class GameLogic implements PlayableLogic{
     }
 
     public void initializeBoard(){
+        for(int row = 0 ; row < 8 ; row++){
+            for (int col = 0 ; col < 8; col++){
+                board[row][col] = null;
+            }
+        }
         board[3][3] = new SimpleDisc(player1);
         board[4][4] = new SimpleDisc(player1);
         board[3][4] = new SimpleDisc(player2);
@@ -33,7 +38,8 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public Disc getDiscAtPosition(Position position) {
-        return null;
+
+        return board[position.getRow()][position.getColumn()];
     }
 
     @Override
@@ -43,9 +49,18 @@ public class GameLogic implements PlayableLogic{
 // ?
     @Override
     public List<Position> ValidMoves() {
-        List<Position> validMoves = new ArrayList<>();
+        List<Position> validMoveList = new ArrayList<>();
+        for(int row = 0 ; row < BOARD_SIZE ; row++){
+            for(int col = 0 ; col < BOARD_SIZE ; col ++){
+                if (board[row][col] == null) {
+                    if (board[row][col].isValidMove()) {
+                        validMoveList.add(move.getPosition());
+                    }
+                }
+            }
+        }
 
-        return null;
+        return validMoveList;
     }
 
     @Override

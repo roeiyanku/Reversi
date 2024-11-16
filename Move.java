@@ -1,28 +1,26 @@
 import javax.swing.text.Position;
-import java.awt.*;
+import java.util.List;
 
 public class Move {
 
     private Disc disc;
     private Player player;
     private Position position;
-    private List flippedDisc;
-
+    private List<Position> flippedDiscs;
 
     public Move(Position position, Disc disc, Player player, List flippedDisc) {
         this.position = position;
         this.disc = disc;
         this.player = player;
-        this.flippedDisc = flippedDisc;
-        //matrix[position.getRow][position.getColumn] = disc
+        this.flippedDiscs = flippedDisc;
     }
 
     public Disc getDisc() {
         return disc;
     }
 
-    public List getFlippedDisc() {
-        return flippedDisc;
+    public List<Position> getFlippedDisc() {
+        return flippedDiscs;
     }
 
     public Player getPlayer() {
@@ -33,9 +31,31 @@ public class Move {
          return position;
     }
 
+    //add public boolean isMoveValid(Position position, Player player)
+
     @Override
     public String toString() {
+            String playerType = player.isPlayerOne() ? "Player 1" : "Player 2"; // בדיקה ישירה לפי isPlayerOne
+            String discType = disc instanceof BombDisc ? "BombDisc" :
+                    disc instanceof UnflippableDisc ? "UnflippableDisc" :
+                            "SimpleDisc";
 
+            // בניית התוצאה
+            StringBuilder sb = new StringBuilder();
+            sb.append(playerType).append(" placed a ").append(discType)
+                    .append(" at ").append(position);
 
+            // הוספת מידע על דיסקים שהתהפכו
+            if (flippedDiscs != null && !flippedDiscs.isEmpty()) {
+                sb.append(". Flipped discs: ");
+                for (Position pos : flippedDiscs) {
+                    sb.append(pos).append(" ");
+                }
+            } else {
+                sb.append(". No discs flipped.");
+            }
+
+            return sb.toString();
+        }
 
 }

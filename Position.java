@@ -1,6 +1,10 @@
+import javax.crypto.BadPaddingException;
+import java.util.List;
+import java.util.ArrayList;
+
 public class Position {
-        private int row;
-        private int column;
+        private static int row;
+        private static int column;
 
         // Constructor
         public Position(int row, int column) {
@@ -9,12 +13,12 @@ public class Position {
         }
 
         // Getter for row
-        public int getRow() {
+        public static int getRow() {
             return row;
         }
 
         // Getter for column
-        public int getColumn() {
+        public static int getColumn() {
             return column;
         }
 
@@ -36,6 +40,27 @@ public class Position {
         // Method to get a neighboring position based on direction
         public Position getNeighbor(int rowOffset, int colOffset) {
             return new Position(this.row + rowOffset, this.column + colOffset);
+        }
+
+        /**
+        * gives a list of all adjacent positions.
+         *
+         * @param row of row of the position
+         * @param col of column  of the position
+         * @return a list of all the adjacent positions to the current position
+         */
+
+        public List<Position> getAdjacentPositions(int row, int col, int BoardSize){
+            List<Position> adjacentPositions = new ArrayList<>();
+            for (int r = row - 1; r <= row + 1; r++) {
+                for (int c = col - 1; c <= col + 1; c++){
+                    //ignore the middle position as well as if out of bounds
+                    if(!(r == row && c == col) ||  r >= 0 || r <BoardSize || c >= 0 || c < BoardSize){
+                        adjacentPositions.add(new Position(r,c));
+                    }
+                }
+            }
+            return adjacentPositions;
         }
 
         // Method to represent the position as a string (useful for debugging)
