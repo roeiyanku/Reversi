@@ -8,11 +8,16 @@ public class Move {
     private Position position;
     private List<Position> flippedDiscs;
 
-    public Move(Position position, Disc disc, Player player, List flippedDisc) {
+    //base constructor
+    public Move(Position position) {
+        this.position = position;
+    }
+
+    public Move(Position position, Disc disc, Player player, List flippedDiscs) {
         this.position = position;
         this.disc = disc;
         this.player = player;
-        this.flippedDiscs = flippedDisc;
+        this.flippedDiscs = flippedDiscs;
     }
 
     public Disc getDisc() {

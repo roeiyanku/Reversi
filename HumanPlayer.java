@@ -1,10 +1,10 @@
-public class HumanPlayer extends AIPlayer{
+public class HumanPlayer extends Player{
     public HumanPlayer(boolean isPlayerOne) {
         super(isPlayerOne);
     }
 
     @Override
-    public Move makeMove(PlayableLogic gameStatus) {
-        return null;
+    boolean isHuman() {
+        return true;
     }
 }
