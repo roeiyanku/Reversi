@@ -1,4 +1,3 @@
-
 public class SimpleDisc implements Disc {
 
     private Player owner;
@@ -15,7 +14,7 @@ public class SimpleDisc implements Disc {
 
     @Override
     public void setOwner(Player player) {
-    this.owner = player;
+        this.owner = player;
     }
 
     @Override

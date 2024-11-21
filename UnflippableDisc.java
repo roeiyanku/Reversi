@@ -15,7 +15,7 @@ public class UnflippableDisc implements Disc {
 
     @Override
     public void setOwner(Player player) {
-    this.owner = player;
+        this.owner = player;
     }
 
     @Override
@@ -23,15 +23,5 @@ public class UnflippableDisc implements Disc {
         return "⭕";
     }
 
-
-    private void countdown(){
-        int count = 2;
-        while (count >= 0){
-            count--;
-
-        }
-
-
-    }
 
 }

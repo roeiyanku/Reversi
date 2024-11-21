@@ -14,16 +14,18 @@ public interface Disc {
     /**
      * Set the player who owns the Disc.
      *
+     * @param player The player to set as the owner.
      */
     void setOwner(Player player);
 
     /**
      * Get the type of the disc.
-     * use the:
-     *          "⬤",         "⭕"                "💣"
+     * Use:
+     *          "⬤",         "⭕",                "💣"
      *      Simple Disc | Unflippedable Disc | Bomb Disc |
      * respectively.
+     *
+     * @return The type of the disc as a String.
      */
     String getType();
-
 }
