@@ -19,21 +19,11 @@ public class BombDisc implements Disc {
 
     @Override
     public String getType() {
-        return "";
+        return "💣";
     }
 
 
     private void explode(){
-
-    }
-
-    private void countdown(){
-        int count = 3;
-        while (count >= 0){
-            count--;
-
-        }
-
 
     }
 

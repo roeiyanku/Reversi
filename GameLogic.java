@@ -19,7 +19,7 @@ public class GameLogic implements PlayableLogic{
     public GameLogic(){
         board = new Disc[BOARD_SIZE][BOARD_SIZE];
     }
-    private void initial_Board() {
+    private void initializeBoard() {
         System.out.println("Initializing board...");
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
@@ -35,6 +35,9 @@ public class GameLogic implements PlayableLogic{
         board[4][4] = new SimpleDisc(player1);
         board[3][4] = new SimpleDisc(player2);
         board[4][3] = new SimpleDisc(player2);
+
+
+        isPlayer1Turn = true;
     }
 
 
@@ -67,13 +70,8 @@ public class GameLogic implements PlayableLogic{
         }
 
         // זיהוי סוג הדיסק
-        if (disc instanceof BombDisc) {
-            System.out.println("💣 Bomb Disc placed at: (" + row + ", " + col + ")");
-        } else if (disc instanceof UnflippableDisc) {
-            System.out.println("⭕ Unflippable Disc placed at: (" + row + ", " + col + ")");
-        } else {
-            System.out.println("⬤ Simple Disc placed at: (" + row + ", " + col + ")");
-        }
+        System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
+                " placed a " + disc.getType() + " at (" + row + ", " + col + ")");
 
         // ביצוע המהלך - הנחת הדיסק
         board[row][col] = disc;
@@ -83,6 +81,9 @@ public class GameLogic implements PlayableLogic{
             int flipRow = flipPosition.row();
             int flipCol = flipPosition.col();
             board[flipRow][flipCol] = new SimpleDisc(disc.getOwner());
+
+            System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
+                    " flipped a disc at (" + flipRow + ", " + flipCol + ")");
         }
 
         // שמירת המהלך להיסטוריה
@@ -98,11 +99,13 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public Disc getDiscAtPosition(Position position) {
+
         int row = position.row();
         int col = position.col();
 
         // בדיקת גבולות נכונה
         if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+            return null;
         }
         return board[row][col];
     }
@@ -226,7 +229,7 @@ public class GameLogic implements PlayableLogic{
         this.player1 = player1;
         this.player2 = player2;
         this.isPlayer1Turn = true;
-        initial_Board();
+        initializeBoard();
     }
 
     @Override
@@ -248,12 +251,57 @@ public class GameLogic implements PlayableLogic{
 
         if (!(player1HasMoves || player2HasMoves)) {
             // המשחק נגמר
-
+            printWinner();
             return true;
         }
 
         return false;
     }
+
+    public void printWinner(){
+        if (isGameFinished()){
+
+            int countPlayer1Disks = 0;
+            int countPlayer2Disks = 0;
+
+            String winnerNumber;
+            String loserNumber;
+
+            int winnerCountDisks = 0;
+            int loserCountDisks = 0;
+
+
+
+            for (int row = 0; row < BOARD_SIZE; row++) {
+                for (int col = 0; col < BOARD_SIZE; col++) {
+                    Disc currentDisc = board[row][col];
+
+                    if (currentDisc.getOwner().equals(player1)){ countPlayer1Disks++ ;}
+                    if (currentDisc.getOwner().equals(player2)){ countPlayer2Disks++ ;}
+                }
+            }
+
+
+
+            if(countPlayer1Disks > countPlayer2Disks ){
+
+                winnerNumber = "1";
+                loserNumber = "2";
+                winnerCountDisks = countPlayer1Disks;
+                loserCountDisks = countPlayer2Disks;
+            }
+            else {
+                winnerNumber = "2";
+                loserNumber = "1";
+                winnerCountDisks = countPlayer2Disks;
+                loserCountDisks = countPlayer1Disks;}
+
+            System.out.println("Player " + winnerNumber + " wins with " + winnerCountDisks+ "discs! Player " + loserNumber + "had " + loserCountDisks + " discs. ");
+        }
+
+    }
+
+
 
     @Override
     public void reset() {
@@ -291,7 +339,8 @@ public class GameLogic implements PlayableLogic{
             if (adjacentRow >= 0 && adjacentRow < BOARD_SIZE &&
                     adjacentCol >= 0 && adjacentCol < BOARD_SIZE &&
                     board[adjacentRow][adjacentCol] != null) {
-                flipped++; // ספר את כל הדיסקים המושפעים
+                        board[adjacentRow][adjacentCol] = null;
+                        flipped++; // ספר את כל הדיסקים המושפעים
             }
         }
 
