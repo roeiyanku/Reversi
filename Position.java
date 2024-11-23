@@ -1,3 +1,7 @@
+/**
+ * The bombDisc class represents the b
+ */
+
 public class Position {
     private int row;
     private int column;
@@ -22,7 +26,7 @@ public class Position {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        Position position = (Position) obj; //we'll see about this
+        Position position = (Position) obj;
         return row == position.row && column == position.column;
     }
 

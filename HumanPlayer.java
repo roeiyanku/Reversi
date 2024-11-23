@@ -1,3 +1,7 @@
+/**
+ * The bombDisc class represents the b
+ */
+
 public class HumanPlayer extends Player{
     public HumanPlayer(boolean isPlayerOne) {
         super(isPlayerOne);

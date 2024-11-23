@@ -1,5 +1,9 @@
 import java.util.List;
 
+/**
+ * The bombDisc class represents the b
+ */
+
 public class GreedyAI extends AIPlayer {
     public GreedyAI(boolean isPlayerOne) {
         super(isPlayerOne);
@@ -7,29 +11,29 @@ public class GreedyAI extends AIPlayer {
 
     @Override
     public Move makeMove(PlayableLogic gameStatus) {
-        // קבלת רשימת מהלכים חוקיים
+        // Get a list of valid moves
         List<Position> validPositions = gameStatus.ValidMoves();
         if (validPositions == null || validPositions.isEmpty()) {
-            return null; // אין מהלכים חוקיים
+            return null;
         }
 
         Move greedyMove = null;
         int mostFlips = -1;
 
-        // יצירת דיסק שמייצג את השחקן הנוכחי
+        // Create a disc representing the current player
         Disc currentDisc = isPlayerOne() ? new SimpleDisc(gameStatus.getFirstPlayer()) : new SimpleDisc(gameStatus.getSecondPlayer());
 
         for (Position position : validPositions) {
-            // חישוב מספר ההפיכות עבור המיקום הנוכחי
+            // Calculate the number of flips for the current position
             int flips = gameStatus.countFlips(position);
 
-            // עדכון המהלך המיטבי אם מספר ההפיכות גבוה יותר
+            // Update the optimal move if the number of flips is higher
             if (flips > mostFlips) {
                 mostFlips = flips;
-                greedyMove = new Move(position, currentDisc); // יצירת מהלך חדש עם המיקום והדיסק
+                greedyMove = new Move(position, currentDisc);
             }
         }
 
-        return greedyMove; // החזרת המהלך המיטבי
+        return greedyMove;
     }
 }

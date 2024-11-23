@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ * The bombDisc class represents the b
+ */
 
 public class GameLogic implements PlayableLogic{
 
@@ -20,7 +23,6 @@ public class GameLogic implements PlayableLogic{
         board = new Disc[BOARD_SIZE][BOARD_SIZE];
     }
     private void initializeBoard() {
-        System.out.println("Initializing board...");
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 board[row][col] = null;
@@ -46,7 +48,7 @@ public class GameLogic implements PlayableLogic{
         int row = position.row();
         int col = position.col();
 
-        // בדיקה אם המיקום מחוץ לגבולות או תפוס
+        // Check if the location is out of bounds or occupied
         if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE || board[row][col] != null) {
             return false;
         }
@@ -64,19 +66,19 @@ public class GameLogic implements PlayableLogic{
             }
         }
 
-        // אם אין כיוונים חוקיים, המהלך אינו חוקי
+        // If there are no valid directions, the move is invalid
         if (!validMove) {
             return false;
         }
 
-        // זיהוי סוג הדיסק
+        // Identifying the disk type
         System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
                 " placed a " + disc.getType() + " at (" + row + ", " + col + ")");
 
-        // ביצוע המהלך - הנחת הדיסק
+        // Making the move - placing the disc
         board[row][col] = disc;
 
-        // הפיכת דיסקים
+        // flipping the disks
         for (Position flipPosition : discsToFlip) {
             int flipRow = flipPosition.row();
             int flipCol = flipPosition.col();
@@ -86,10 +88,10 @@ public class GameLogic implements PlayableLogic{
                     " flipped a disc at (" + flipRow + ", " + flipCol + ")");
         }
 
-        // שמירת המהלך להיסטוריה
+        // saving the move in the history
         moveHistory.push(new Move(position, disc));
 
-        // מעבר תור
+
         isPlayer1Turn = !isPlayer1Turn;
 
         return true;
@@ -103,7 +105,7 @@ public class GameLogic implements PlayableLogic{
         int row = position.row();
         int col = position.col();
 
-        // בדיקת גבולות נכונה
+        // Correct bounds checking
         if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
             return null;
         }
@@ -120,15 +122,15 @@ public class GameLogic implements PlayableLogic{
     public List<Position> ValidMoves() {
         List<Position> validMoves = new ArrayList<>();
 
-        // בדיקה מי השחקן הנוכחי
+        // Check who the current player is
         Disc currentDisc = isPlayer1Turn ? new SimpleDisc(player1) : new SimpleDisc(player2);
 
-        // מעבר על כל משבצת בלוח
+        // Go over each position in the board
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 Position position = new Position(row, col);
 
-                // אם המיקום פנוי ויש לפחות כיוון חוקי אחד
+                // If the position is free and there is at least one valid direction
                 if (board[row][col] == null && hasValidDirection(position, currentDisc)) {
                     validMoves.add(position);
                 }
@@ -148,63 +150,62 @@ public class GameLogic implements PlayableLogic{
         int row = a.row();
         int col = a.col();
 
-        // אם המיקום מחוץ לגבולות או תפוס, אין מה לחשב
+        // If the location is out of bounds or occupied, nothing to calculate
         if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE || board[row][col] != null) {
             return 0;
         }
 
-        // קבע מי השחקן הנוכחי
+        // Determine who the current player is
         Disc currentDisc = isPlayer1Turn ? new SimpleDisc(player1) : new SimpleDisc(player2);
 
-        // בדוק את כל 8 הכיוונים
+        // check all 8 directions
         for (int[] direction : directions) {
             int flips = 0;
             int currentRow = row + direction[0];
             int currentCol = col + direction[1];
             boolean foundOpponent = false;
 
-            // התקדמות בכיוון
+            // Progress in the direction
             while (currentRow >= 0 && currentRow < BOARD_SIZE &&
                     currentCol >= 0 && currentCol < BOARD_SIZE) {
                 Disc currentDiscInDirection = board[currentRow][currentCol];
 
-                // אם המיקום ריק, אין מה להפוך
+                // if the position is empty then null
                 if (currentDiscInDirection == null) {
                     flips = 0;
                     break;
                 }
 
-                // טיפול בדיסקים מסוגים שונים
                 if (currentDiscInDirection instanceof UnflippableDisc) {
-                    flips = 0; // דיסק שאי אפשר להפוך עוצר את הרצף
+                    flips = 0; // An unfilppable disk will stop the chain of flips
                     break;
                 }
 
                 if (currentDiscInDirection instanceof BombDisc) {
-                    flips += handleBombDisc(new Position(currentRow, currentCol)); // ספירת דיסקים מושפעים מדיסק פצצה
-                    break; // דיסק פצצה עוצר את הבדיקה בכיוון זה
+                    flips += handleBombDisc(new Position(currentRow, currentCol));
+                    break;
                 }
 
-                // ספירה רגילה לדיסקים רגילים
+                // regular disk count
                 if (!currentDiscInDirection.getOwner().equals(currentDisc.getOwner())) {
                     foundOpponent = true;
                     flips++;
                 } else {
-                    // אם מצאנו דיסק של השחקן הנוכחי, ונמצא יריב קודם, סיים את הבדיקה בכיוון זה
+                    // If we found a disk of the current player, and found a previous opponent, end the test in that direction
                     if (foundOpponent) {
                         break;
                     } else {
-                        flips = 0; // אם אין יריב ברצף, אין מה להפוך
+                        flips = 0; // if there is no opponent in the line, nothing to flip.
                         break;
                     }
                 }
 
-                // המשך לכיוון הבא
+                // checking the next direction
                 currentRow += direction[0];
                 currentCol += direction[1];
             }
 
-            // הוסף את מספר ההיפוכים הכולל
+            // adding total flips
             totalFlips += flips;
         }
 
@@ -250,7 +251,7 @@ public class GameLogic implements PlayableLogic{
         isPlayer1Turn = originalTurn;
 
         if (!(player1HasMoves || player2HasMoves)) {
-            // המשחק נגמר
+            //game is over
             printWinner();
             return true;
         }
@@ -258,8 +259,8 @@ public class GameLogic implements PlayableLogic{
         return false;
     }
 
+    //method used to print the winner of the game.
     public void printWinner(){
-        if (isGameFinished()){
 
             int countPlayer1Disks = 0;
             int countPlayer2Disks = 0;
@@ -296,8 +297,7 @@ public class GameLogic implements PlayableLogic{
                 winnerCountDisks = countPlayer2Disks;
                 loserCountDisks = countPlayer1Disks;}
 
-            System.out.println("Player " + winnerNumber + " wins with " + winnerCountDisks+ "discs! Player " + loserNumber + "had " + loserCountDisks + " discs. ");
-        }
+            System.out.println("Player " + winnerNumber + " wins with " + winnerCountDisks+ " discs! Player " + loserNumber + " had " + loserCountDisks + " discs. ");
 
     }
 
@@ -305,7 +305,6 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public void reset() {
-        System.out.println("Resetting game.");
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 board[row][col] = null;
@@ -326,11 +325,12 @@ public class GameLogic implements PlayableLogic{
     @Override
     public void undoLastMove() {
 
+
     }
     private int handleBombDisc(Position position) {
         int flipped = 0;
 
-        // עובר על כל הסביבה של הדיסק הפצצה
+        // all  the bomb disks' environment
         int[][] bombDirections = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
         for (int[] dir : bombDirections) {
             int adjacentRow = position.row() + dir[0];
@@ -340,7 +340,7 @@ public class GameLogic implements PlayableLogic{
                     adjacentCol >= 0 && adjacentCol < BOARD_SIZE &&
                     board[adjacentRow][adjacentCol] != null) {
                         board[adjacentRow][adjacentCol] = null;
-                        flipped++; // ספר את כל הדיסקים המושפעים
+                        flipped++; // add all affected disks
             }
         }
 
@@ -349,18 +349,15 @@ public class GameLogic implements PlayableLogic{
     private boolean preform_move(Position move, Disc disc) {
         System.out.println("Attempting to perform move at: " + move);
 
-        // בדיקה אם המהלך חוקי
+        // check if move is legal
         if (!locate_disc(move, disc)) {
             System.out.println("Move is invalid.");
             return false;
         }
 
-        // הנח את הדיסק
+
         board[move.row()][move.col()] = disc;
         System.out.println("Move placed at: (" + move.row() + ", " + move.col() + ")");
-
-        // כאן ניתן להוסיף פונקציה להיפוך דיסקים, אם יש צורך
-        // flipDiscs(move, disc);
 
         return true;
     }
@@ -378,19 +375,19 @@ public class GameLogic implements PlayableLogic{
             Disc currentDisc = board[currentRow][currentCol];
 
             if (currentDisc == null) {
-                // אין רצף בכיוון הזה
+                // There is no sequence in this direction
                 return false;
             }
 
             if (!currentDisc.getOwner().equals(disc.getOwner())) {
-                // מצאנו דיסק של היריב
+                // found opponent's disk
                 foundOpponent = true;
             } else {
-                // אם מצאנו דיסק של השחקן הנוכחי אחרי דיסק של היריב
+                // If we found a disk of the current player after a disk of the opponent
                 return foundOpponent;
             }
 
-            // התקדמות בכיוון
+            // Progress in direction
             currentRow += dRow;
             currentCol += dCol;
         }
@@ -410,25 +407,25 @@ public class GameLogic implements PlayableLogic{
             Disc currentDisc = board[currentRow][currentCol];
 
             if (currentDisc == null) {
-                // אין רצף בכיוון הזה
+                // No progress in direction
                 return new ArrayList<>();
             }
 
             if (!currentDisc.getOwner().equals(disc.getOwner())) {
-                // מצאנו דיסק של היריב
+                // found opponent's disk
                 foundOpponent = true;
                 flippableDiscs.add(new Position(currentRow, currentCol));
             } else {
-                // מצאנו דיסק של השחקן הנוכחי
+                // We found the current player's disk
                 return foundOpponent ? flippableDiscs : new ArrayList<>();
             }
 
-            // התקדמות בכיוון
+            // Progress in direction
             currentRow += dRow;
             currentCol += dCol;
         }
 
-        // אם לא מצאנו דיסק של השחקן הנוכחי, הרצף לא חוקי
+        // If we did not find a disc for the current player, the sequence is invalid
         return new ArrayList<>();
     }
 
@@ -437,12 +434,12 @@ public class GameLogic implements PlayableLogic{
             int dRow = direction[0];
             int dCol = direction[1];
 
-            // בדיקת דיסקים שניתן להפוך בכיוון זה
+            // Check for disks that can be flipped in this direction
             if (!getFlippableDiscsInDirection(position, dRow, dCol, disc).isEmpty()) {
-                return true; // אם לפחות כיוון אחד חוקי
+                return true; // If at least one direction is valid
             }
         }
-        return false; // אין כיוונים חוקיים
+        return false; // No valid directions.
     }
 
 

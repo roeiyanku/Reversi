@@ -2,7 +2,7 @@ public class SimpleDisc implements Disc {
 
     private Player owner;
 
-
+    //constructor
     public SimpleDisc(Player owner) {
         this.owner = owner;
     }

@@ -1,8 +1,13 @@
+/**
+ * The bombDisc class represents the b
+ */
+
 public class BombDisc implements Disc {
 
 
     private Player owner;
 
+    //constructor
     public BombDisc(Player owner) {
         this.owner = owner;
     }

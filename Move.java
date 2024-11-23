@@ -1,12 +1,15 @@
-import javax.swing.text.Position;
 import java.util.List;
-
+/**
+ * The bombDisc class represents the b
+ */
 public class Move {
 
     private Disc disc;
     private Player player;
     private Position position;
-    private List<Position> flippedDiscs;
+    private List flippedDiscs;
+    ;
+
 
     //base constructor
     public Move(Position position) {
@@ -18,6 +21,18 @@ public class Move {
         this.disc = disc;
         this.player = player;
         this.flippedDiscs = flippedDiscs;
+    }
+    public Move(Position position, Disc disc) {
+        this.position = position;
+        this.disc = disc;
+
+
+    }
+    public Position position() {
+        return this.position;
+    }
+    public Disc disc() {
+        return this.disc;
     }
 
     public Disc getDisc() {
@@ -33,32 +48,8 @@ public class Move {
     }
 
     public Position getPosition() {
-         return position;
+        return position;
     }
 
-    @Override
-    public String toString() {
-            String playerType = player.isPlayerOne() ? "Player 1" : "Player 2"; // בדיקה ישירה לפי isPlayerOne
-            String discType = disc instanceof BombDisc ? "BombDisc" :
-                    disc instanceof UnflippableDisc ? "UnflippableDisc" :
-                            "SimpleDisc";
-
-            // בניית התוצאה
-            StringBuilder sb = new StringBuilder();
-            sb.append(playerType).append(" placed a ").append(discType)
-                    .append(" at ").append(position);
-
-            // הוספת מידע על דיסקים שהתהפכו
-            if (flippedDiscs != null && !flippedDiscs.isEmpty()) {
-                sb.append(". Flipped discs: ");
-                for (Position pos : flippedDiscs) {
-                    sb.append(pos).append(" ");
-                }
-            } else {
-                sb.append(". No discs flipped.");
-            }
-
-            return sb.toString();
-        }
 
 }

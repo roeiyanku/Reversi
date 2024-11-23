@@ -1,6 +1,7 @@
-import javax.swing.text.Position;
 import java.util.List;
-
+    /**
+    *The bombDisc class represents the b
+    */
 public class miniMaxAI extends AIPlayer {
 
     private static final int MAX_DEPTH = 3;  // Limit to 3 moves ahead

@@ -1,9 +1,12 @@
-public class UnflippableDisc implements Disc {
+/**
+ * The bombDisc class represents the b
+ */
 
-    int count = 2;
+public class UnflippableDisc implements Disc {
 
     private Player owner;
 
+    //constructor
     public UnflippableDisc(Player owner) {
         this.owner = owner;
     }
