@@ -73,7 +73,7 @@ public class GameLogic implements PlayableLogic{
 
         // Identifying the disk type
         System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
-                " placed a " + disc.getType() + " at (" + row + ", " + col + ")");
+                " placed a " + disc.getType() + " in " + position.toString());
 
         // Making the move - placing the disc
         board[row][col] = disc;
@@ -85,8 +85,9 @@ public class GameLogic implements PlayableLogic{
             board[flipRow][flipCol] = new SimpleDisc(disc.getOwner());
 
             System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
-                    " flipped a disc at (" + flipRow + ", " + flipCol + ")");
+                    " flipped the " + disc.getType() + " in " + flipPosition.toString());
         }
+        System.out.println();
 
         // saving the move in the history
         moveHistory.push(new Move(position, disc));
@@ -283,21 +284,29 @@ public class GameLogic implements PlayableLogic{
             }
 
 
+            if(countPlayer1Disks == countPlayer2Disks ){System.out.println("Tie!");} //If there's a tie, No one gets a win.
 
-            if(countPlayer1Disks > countPlayer2Disks ){
+            else if(countPlayer1Disks > countPlayer2Disks ){ //If player1 wins.
+
+                player1.wins++;
 
                 winnerNumber = "1";
                 loserNumber = "2";
                 winnerCountDisks = countPlayer1Disks;
                 loserCountDisks = countPlayer2Disks;
+                System.out.println("Player " + winnerNumber + " wins with " + winnerCountDisks+ " discs! Player " + loserNumber + " had " + loserCountDisks + " discs. ");
             }
-            else {
+            else { //If player2 wins.
+
+                player2.wins++;
+
                 winnerNumber = "2";
                 loserNumber = "1";
                 winnerCountDisks = countPlayer2Disks;
-                loserCountDisks = countPlayer1Disks;}
+                loserCountDisks = countPlayer1Disks;
+                System.out.println("Player " + winnerNumber + " wins with " + winnerCountDisks+ " discs! Player " + loserNumber + " had " + loserCountDisks + " discs. ");
+            }
 
-            System.out.println("Player " + winnerNumber + " wins with " + winnerCountDisks+ " discs! Player " + loserNumber + " had " + loserCountDisks + " discs. ");
 
     }
 
@@ -324,9 +333,52 @@ public class GameLogic implements PlayableLogic{
 
     @Override
     public void undoLastMove() {
+        //if at least one player is not human, UndoLastMove cannot be used.
+        if(!(player1.isHuman()) || !(player2.isHuman())){
+            System.out.println("UndoLastMove cannot be used since there's at least one player who is not human");
+            return;
+        }
+        System.out.println("Undoing last move:");
+
+        if(moveHistory.empty()){
+            System.out.println("\tNo previous move available to undo.");
+            System.out.println();
+        } //If first move.
+
+        Move lastMove = moveHistory.pop(); //get the last move and all its contents.
+        Position lastPosition = lastMove.getPosition();
+        Disc lastDisc = lastMove.getDisc();
+        Player lastPlayer = lastMove.getPlayer();
+        List<Position> lastFlippedDiscs = lastMove.getFlippedDisc();
+
+        //removing the last disc located.
+        System.out.println("\tUndo: removing " + lastDisc.getType() + " from " + lastPosition.toString());
+        board[lastPosition.row()][lastPosition.col()] = null;
+
+        //System.out.println("\tUndo: flipping back " + lastDisc.getType() + " in " +lastPosition.toString() );
+
+        //flipping back all the flipped disks.
+        for (Position flipPosition : lastFlippedDiscs) {
+
+            Player originalOwner = (lastDisc.getOwner().equals(player1)) ? player2 : player1;
+            Disc originalDisc = new SimpleDisc(originalOwner);
+
+            board[flipPosition.row()][flipPosition.col()] = originalDisc;
+
+            System.out.printf("\tUndo: flipping back "+originalDisc.getType()+" in "+  flipPosition.toString());
+        }
 
 
+
+
+        // Turn back to the previous player
+        isPlayer1Turn = !isPlayer1Turn;
+
+        System.out.println();
     }
+
+
+
     private int handleBombDisc(Position position) {
         int flipped = 0;
 
