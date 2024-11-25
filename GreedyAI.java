@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Comparator;
 
 /**
  * The GreedyAI class extends the AI player.
@@ -27,12 +28,17 @@ public class GreedyAI extends AIPlayer {
         // Create a disc representing the current player
         Disc currentDisc = isPlayerOne() ? new SimpleDisc(gameStatus.getFirstPlayer()) : new SimpleDisc(gameStatus.getSecondPlayer());
 
+        //creates a comparator to sort all positions, and if there's a tie get the most right and then the most Bottom
+        Comparator<Position> positionComparator = Comparator
+                .comparingInt(Position::col) // Rightmost
+                .thenComparingInt(Position::row); //BottomMost
+
         for (Position position : validPositions) {
             // Calculate the number of flips for the current position
             int flips = gameStatus.countFlips(position);
 
             // Update the optimal move if the number of flips is higher
-            if (flips > mostFlips) {
+            if (flips > mostFlips || (flips == mostFlips && positionComparator.compare(position, greedyMove.getPosition()) > 0)) {
                 mostFlips = flips;
                 greedyMove = new Move(position, currentDisc);
             }
@@ -40,4 +46,7 @@ public class GreedyAI extends AIPlayer {
 
         return greedyMove;
     }
+
+
+
 }
