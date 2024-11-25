@@ -1,3 +1,7 @@
+/**
+ * The SimpleDisc class represents a standard disc used in the game.
+ */
+
 public class SimpleDisc implements Disc {
 
     private Player owner;

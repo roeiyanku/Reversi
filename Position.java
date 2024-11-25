@@ -1,5 +1,6 @@
 /**
- * The bombDisc class represents the b
+ * The Position class represents a specific location on the game board
+ * using row and column coordinates.
  */
 
 public class Position {

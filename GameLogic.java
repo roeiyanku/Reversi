@@ -3,8 +3,10 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * The bombDisc class represents the b
+ * The GameLogic class implements the PlayableLogic. It contains the core rules and mechanics of the game,
+ * including move validation, player turns, and game state management.
  */
+
 
 public class GameLogic implements PlayableLogic{
 
@@ -278,10 +280,15 @@ public class GameLogic implements PlayableLogic{
                 for (int col = 0; col < BOARD_SIZE; col++) {
                     Disc currentDisc = board[row][col];
 
+                    if (currentDisc == null) {
+                        continue;}
+
                     if (currentDisc.getOwner().equals(player1)){ countPlayer1Disks++ ;}
                     if (currentDisc.getOwner().equals(player2)){ countPlayer2Disks++ ;}
                 }
             }
+
+
 
 
             if(countPlayer1Disks == countPlayer2Disks ){System.out.println("Tie!");} //If there's a tie, No one gets a win.
@@ -340,22 +347,20 @@ public class GameLogic implements PlayableLogic{
         }
         System.out.println("Undoing last move:");
 
-        if(moveHistory.empty()){
+        if(moveHistory.empty()){ //If first move.
             System.out.println("\tNo previous move available to undo.");
             System.out.println();
-        } //If first move.
+            return;
+        }
 
         Move lastMove = moveHistory.pop(); //get the last move and all its contents.
         Position lastPosition = lastMove.getPosition();
         Disc lastDisc = lastMove.getDisc();
-        Player lastPlayer = lastMove.getPlayer();
         List<Position> lastFlippedDiscs = lastMove.getFlippedDisc();
 
         //removing the last disc located.
         System.out.println("\tUndo: removing " + lastDisc.getType() + " from " + lastPosition.toString());
         board[lastPosition.row()][lastPosition.col()] = null;
-
-        //System.out.println("\tUndo: flipping back " + lastDisc.getType() + " in " +lastPosition.toString() );
 
         //flipping back all the flipped disks.
         for (Position flipPosition : lastFlippedDiscs) {
@@ -367,8 +372,6 @@ public class GameLogic implements PlayableLogic{
 
             System.out.printf("\tUndo: flipping back "+originalDisc.getType()+" in "+  flipPosition.toString());
         }
-
-
 
 
         // Turn back to the previous player

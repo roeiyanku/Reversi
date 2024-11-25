@@ -2,8 +2,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The bombDisc class represents the b
+ * The RandomAI class represents an AI player that
+ * selects a possible move based on a normal distribution and chooses a disc at random (provided it has enough discs).
  */
+
 
 public class RandomAI extends AIPlayer {
     public RandomAI(boolean isPlayerOne) {

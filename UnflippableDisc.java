@@ -1,6 +1,8 @@
 /**
- * The bombDisc class represents the b
+ * The UnflippableDisc class represents a type of disc
+ * that once used, cannot be flipped again.
  */
+
 
 public class UnflippableDisc implements Disc {
 

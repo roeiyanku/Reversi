@@ -1,6 +1,8 @@
 /**
- * The bombDisc class represents the b
+ * The BombDisc class represents a type of disc in the game
+ * that when activated, it will explode and flip surrounding disks.
  */
+
 
 public class BombDisc implements Disc {
 

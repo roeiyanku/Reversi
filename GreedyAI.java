@@ -1,8 +1,12 @@
 import java.util.List;
 
 /**
- * The bombDisc class represents the b
+ * The GreedyAI class extends the AI player.
+ * The Greedy player chooses the move that flips the most opponent discs (always selects a regular disc).
+ * In cases where there are multiple such moves, it selects the rightmost square.
+ * If there are still ties, it selects the bottommost square (using a comparator).
  */
+
 
 public class GreedyAI extends AIPlayer {
     public GreedyAI(boolean isPlayerOne) {
