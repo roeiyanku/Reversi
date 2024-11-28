@@ -37,7 +37,7 @@ public class RandomAI extends AIPlayer {
         // Determine the current player
         Player currentPlayer = isPlayerOne() ? gameStatus.getFirstPlayer() : gameStatus.getSecondPlayer();
 
-        // Instantiate the selected disc type with simple if-else logic
+        // choose the type of disc
         Disc selectedDisc = null;
         if (selectedDiscType.equals("SimpleDisc")) {
             selectedDisc = new SimpleDisc(currentPlayer);
@@ -51,7 +51,7 @@ public class RandomAI extends AIPlayer {
         int randomIndex = random.nextInt(validPositions.size());
         Position randomPosition = validPositions.get(randomIndex);
 
-        // Returning the random move
+
         return new Move(randomPosition, selectedDisc);
     }
 }
