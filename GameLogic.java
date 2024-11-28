@@ -12,8 +12,8 @@ public class GameLogic implements PlayableLogic{
 
     private Player player1;
     private Player player2;
-    private boolean isPlayer1Turn;
-    private Disc[][] board;
+    private boolean isPlayer1Turn = true;
+    private Disc[][] board = new Disc[getBoardSize()][getBoardSize()];
     private static final int BOARD_SIZE = 8;
     private Stack<Move> moveHistory = new Stack<>();
     private final int[][] directions = {
