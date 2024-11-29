@@ -75,7 +75,10 @@ public class GameLogic implements PlayableLogic{
         }
 
         // Making the move - placing the disc
-        if("disk is in the valid type of disk list"){board[row][col] = disc;}
+        //Tomer: Please add that:
+        //if("disk is in the valid type of disk list"){
+            board[row][col] = disc;
+        //}
 
         if(disc instanceof BombDisc){
             disc.getOwner().reduce_bomb();
@@ -100,6 +103,9 @@ public class GameLogic implements PlayableLogic{
 
             if(board[flipRow][flipCol] instanceof UnflippableDisc){
                 continue;} //This makes the Unflippable Disk never be flipped.
+
+            if(board[flipRow][flipCol] instanceof BombDisc){
+                board[flipRow][flipCol] = new BombDisc(disc.getOwner());}
 
             board[flipRow][flipCol] = new SimpleDisc(disc.getOwner());
 
@@ -202,9 +208,9 @@ public class GameLogic implements PlayableLogic{
                     //needs to skip to the next square
                 }
 
-                if (currentDiscInDirection instanceof BombDisc) {
+                if ((currentDiscInDirection instanceof BombDisc)  && (!currentDiscInDirection.getOwner().equals(currentDisc.getOwner()))) {
                     flips += handleBombDisc(new Position(currentRow, currentCol));
-                    break;
+                    foundOpponent = true;
                 }
 
                 // regular disk count
@@ -456,25 +462,43 @@ public class GameLogic implements PlayableLogic{
 
 
     private int handleBombDisc(Position position) {
-        int flipped = 0;
+        int flippedAroundBomb = 0;
 
-        // all  the bomb disks' environment
-        int[][] bombDirections = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+        // All 8 directions around the bomb
+        int[][] bombDirections = {
+                {-1, 0}, {1, 0}, {0, -1}, {0, 1}, // Horizontal and vertical
+                {-1, -1}, {-1, 1}, {1, -1}, {1, 1} // Diagonals
+        };
+
+        // Determine the current player
+        Player currentPlayer = isPlayer1Turn ? player1 : player2;
+
         for (int[] dir : bombDirections) {
             int adjacentRow = position.row() + dir[0];
             int adjacentCol = position.col() + dir[1];
 
+            // Ensure the position is within bounds before accessing the board
             if (adjacentRow >= 0 && adjacentRow < BOARD_SIZE &&
-                    adjacentCol >= 0 && adjacentCol < BOARD_SIZE &&
-                    board[adjacentRow][adjacentCol] != null) {
-                        board[adjacentRow][adjacentCol] = null;
-                        flipped++; // add all affected disks
+                    adjacentCol >= 0 && adjacentCol < BOARD_SIZE) {
+
+                Disc currentDisc = board[adjacentRow][adjacentCol];
+
+                // Check if the disc is valid for flipping and belongs to the opponent
+                if (currentDisc != null &&
+                        !(currentDisc instanceof UnflippableDisc) &&
+                        currentDisc.getOwner() != currentPlayer) {
+
+                    // Flip the owner of the opponent's disc
+                    currentDisc.setOwner(currentPlayer);
+                    board[adjacentRow][adjacentCol] = currentDisc;
+
+                    // Increment the count of flipped discs
+                    flippedAroundBomb++;
+                }
             }
         }
 
-        return flipped;
+        return flippedAroundBomb;
     }
-
-
 
 }
