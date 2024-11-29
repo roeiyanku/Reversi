@@ -24,6 +24,7 @@ public class GameLogic implements PlayableLogic{
     public GameLogic(){
         board = new Disc[BOARD_SIZE][BOARD_SIZE];
     }
+
     private void initializeBoard() {
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
@@ -73,17 +74,33 @@ public class GameLogic implements PlayableLogic{
             return false;
         }
 
+        // Making the move - placing the disc
+        if("disk is in the valid type of disk list"){board[row][col] = disc;}
+
+        if(disc instanceof BombDisc){
+            disc.getOwner().reduce_bomb();
+            }
+
+        if(disc instanceof UnflippableDisc){
+            disc.getOwner().reduce_unflippedable();
+        }
+
         // Identifying the disk type
         System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
                 " placed a " + disc.getType() + " in " + position.toString());
 
-        // Making the move - placing the disc
-        board[row][col] = disc;
+
 
         // flipping the disks
         for (Position flipPosition : discsToFlip) {
+
             int flipRow = flipPosition.row();
             int flipCol = flipPosition.col();
+
+
+            if(board[flipRow][flipCol] instanceof UnflippableDisc){
+                continue;} //This makes the Unflippable Disk never be flipped.
+
             board[flipRow][flipCol] = new SimpleDisc(disc.getOwner());
 
             System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
@@ -179,9 +196,10 @@ public class GameLogic implements PlayableLogic{
                     break;
                 }
 
-                if (currentDiscInDirection instanceof UnflippableDisc) {
-                    flips = 0; // An unfilppable disk will stop the chain of flips
-                    break;
+                if ((currentDiscInDirection instanceof UnflippableDisc) && (!currentDiscInDirection.getOwner().equals(currentDisc.getOwner()))){
+                    flips--;
+                    foundOpponent = true;
+                    //needs to skip to the next square
                 }
 
                 if (currentDiscInDirection instanceof BombDisc) {
@@ -190,22 +208,26 @@ public class GameLogic implements PlayableLogic{
                 }
 
                 // regular disk count
+                //if the cuurent disc is of the opponent
                 if (!currentDiscInDirection.getOwner().equals(currentDisc.getOwner())) {
                     foundOpponent = true;
                     flips++;
-                } else {
+                }
+                //If the current disc is the current player's disk:
+                if (currentDiscInDirection.getOwner().equals(currentDisc.getOwner()) ){
                     // If we found a disk of the current player, and found a previous opponent, end the test in that direction
                     if (foundOpponent) {
                         break;
-                    } else {
+                    }
+                    if(!foundOpponent){
                         flips = 0; // if there is no opponent in the line, nothing to flip.
                         break;
                     }
                 }
 
-                // checking the next direction
+                 // checking the next direction
                 currentRow += direction[0];
-                currentCol += direction[1];
+                 currentCol += direction[1];
             }
 
             // adding total flips
@@ -215,7 +237,55 @@ public class GameLogic implements PlayableLogic{
         return totalFlips;
     }
 
+    private List<Position> getFlippableDiscsInDirection(Position position, int dRow, int dCol, Disc disc) {
+        List<Position> flippableDiscs = new ArrayList<>();
+        int currentRow = position.row() + dRow;
+        int currentCol = position.col() + dCol;
+        boolean foundOpponent = false;
 
+        while (currentRow >= 0 && currentRow < BOARD_SIZE &&
+                currentCol >= 0 && currentCol < BOARD_SIZE) {
+            Disc currentDisc = board[currentRow][currentCol];
+
+            if (currentDisc == null) {
+                // No progress in direction
+                return new ArrayList<>();
+            }
+
+
+
+            if (!currentDisc.getOwner().equals(disc.getOwner())) {
+                // found opponent's disk
+                foundOpponent = true;
+                if(!(currentDisc instanceof UnflippableDisc)){ //can't add unflippable Discs to Flippable list
+                    flippableDiscs.add(new Position(currentRow, currentCol));}
+            } else {
+                // We found the current player's disk
+                return foundOpponent ? flippableDiscs : new ArrayList<>();
+            }
+
+            // Progress in direction
+            currentRow += dRow;
+            currentCol += dCol;
+        }
+
+        // If we did not find a disc for the current player, the sequence is invalid
+        return new ArrayList<>();
+    }
+
+    //returns true or false if the current disk has at least one validDirection
+    private boolean hasValidDirection(Position position, Disc disc) {
+        for (int[] direction : directions) {
+            int dRow = direction[0];
+            int dCol = direction[1];
+
+            // Check for disks that can be flipped in this direction
+            if (!getFlippableDiscsInDirection(position, dRow, dCol, disc).isEmpty()) {
+                return true; // If at least one direction is valid
+            }
+        }
+        return false; // No valid directions.
+    }
 
 
     @Override
@@ -253,8 +323,9 @@ public class GameLogic implements PlayableLogic{
 
         isPlayer1Turn = originalTurn;
 
-        if (!(player1HasMoves || player2HasMoves)) {
+        if ((isPlayer1Turn && !player1HasMoves) || (!isPlayer1Turn && !player2HasMoves)) {
             //game is over
+            moveHistory.clear();
             printWinner();
             return true;
         }
@@ -262,7 +333,7 @@ public class GameLogic implements PlayableLogic{
         return false;
     }
 
-    //method used to print the winner of the game.
+    //method used to print the winner of the game. (and also count the discs for each player)
     public void printWinner(){
 
             int countPlayer1Disks = 0;
@@ -331,6 +402,8 @@ public class GameLogic implements PlayableLogic{
         board[3][4] = new SimpleDisc(player2);
         board[4][3] = new SimpleDisc(player2);
         board[4][4] = new SimpleDisc(player1);
+
+        moveHistory.clear();
 
         isPlayer1Turn = true;
     }
@@ -401,101 +474,7 @@ public class GameLogic implements PlayableLogic{
 
         return flipped;
     }
-    private boolean preform_move(Position move, Disc disc) {
-        System.out.println("Attempting to perform move at: " + move);
 
-        // check if move is legal
-        if (!locate_disc(move, disc)) {
-            System.out.println("Move is invalid.");
-            return false;
-        }
-
-
-        board[move.row()][move.col()] = disc;
-        System.out.println("Move placed at: (" + move.row() + ", " + move.col() + ")");
-
-        return true;
-    }
-
-
-
-    private boolean canCaptureInDirection(int startRow, int startCol, int dRow, int dCol, Disc disc) {
-        int currentRow = startRow + dRow;
-        int currentCol = startCol + dCol;
-
-        boolean foundOpponent = false;
-
-        while (currentRow >= 0 && currentRow < BOARD_SIZE &&
-                currentCol >= 0 && currentCol < BOARD_SIZE) {
-            Disc currentDisc = board[currentRow][currentCol];
-
-            if (currentDisc == null) {
-                // There is no sequence in this direction
-                return false;
-            }
-
-            if (!currentDisc.getOwner().equals(disc.getOwner())) {
-                // found opponent's disk
-                foundOpponent = true;
-            } else {
-                // If we found a disk of the current player after a disk of the opponent
-                return foundOpponent;
-            }
-
-            // Progress in direction
-            currentRow += dRow;
-            currentCol += dCol;
-        }
-
-        // אם הלולאה הסתיימה ללא מציאת דיסק של השחקן הנוכחי, זה לא כיוון תקף
-        return false;
-    }
-
-    private List<Position> getFlippableDiscsInDirection(Position position, int dRow, int dCol, Disc disc) {
-        List<Position> flippableDiscs = new ArrayList<>();
-        int currentRow = position.row() + dRow;
-        int currentCol = position.col() + dCol;
-        boolean foundOpponent = false;
-
-        while (currentRow >= 0 && currentRow < BOARD_SIZE &&
-                currentCol >= 0 && currentCol < BOARD_SIZE) {
-            Disc currentDisc = board[currentRow][currentCol];
-
-            if (currentDisc == null) {
-                // No progress in direction
-                return new ArrayList<>();
-            }
-
-            if (!currentDisc.getOwner().equals(disc.getOwner())) {
-                // found opponent's disk
-                foundOpponent = true;
-                flippableDiscs.add(new Position(currentRow, currentCol));
-            } else {
-                // We found the current player's disk
-                return foundOpponent ? flippableDiscs : new ArrayList<>();
-            }
-
-            // Progress in direction
-            currentRow += dRow;
-            currentCol += dCol;
-        }
-
-        // If we did not find a disc for the current player, the sequence is invalid
-        return new ArrayList<>();
-    }
-
-    private boolean hasValidDirection(Position position, Disc disc) {
-        for (int[] direction : directions) {
-            int dRow = direction[0];
-            int dCol = direction[1];
-
-            // Check for disks that can be flipped in this direction
-            if (!getFlippableDiscsInDirection(position, dRow, dCol, disc).isEmpty()) {
-                return true; // If at least one direction is valid
-            }
-        }
-        return false; // No valid directions.
-    }
 
 
 }

@@ -29,9 +29,4 @@ public class BombDisc implements Disc {
         return "💣";
     }
 
-
-    private void explode(){
-
-    }
-
 }
