@@ -131,11 +131,14 @@ public class GameLogic implements PlayableLogic{
               //  int flippedCount = result.getFlippedCount();
                 List<Position> flippedBombDiscs = result.getFlippedBombDiscs();
                 flippedDiscs.addAll(flippedBombDiscs);
-                flippedDiscs.add(flipPosition);
+                Position newPosition = new Position(flipPosition, getDiscAtPosition(flipPosition));
+                flippedDiscs.add(newPosition);
             }
 
             else {board[flipRow][flipCol] = new SimpleDisc(disc.getOwner());
-                flippedDiscs.add(flipPosition);
+                Position newPosition = new Position(flipPosition, getDiscAtPosition(flipPosition));
+
+                flippedDiscs.add(newPosition);
             }
 
             System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
@@ -226,7 +229,7 @@ public class GameLogic implements PlayableLogic{
             while (currentRow >= 0 && currentRow < BOARD_SIZE &&
                     currentCol >= 0 && currentCol < BOARD_SIZE) {
                 Disc currentDiscInDirection = board[currentRow][currentCol];
-                Position currentPosition = new Position(currentRow, currentCol);
+                Position currentPosition = new Position(currentRow, currentCol, currentDiscInDirection);
 
                 // if the position is empty then null
                 if (currentDiscInDirection == null) {
@@ -296,7 +299,7 @@ public class GameLogic implements PlayableLogic{
                 // found opponent's disk
                 foundOpponent = true;
                 if(!(currentDisc instanceof UnflippableDisc)){ //can't add unflippable Discs to Flippable list
-                    flippableDiscs.add(new Position(currentRow, currentCol));}
+                    flippableDiscs.add(new Position(currentRow, currentCol) );}
             } else {
                 // We found the current player's disk
                 return foundOpponent ? flippableDiscs : new ArrayList<>();
@@ -479,7 +482,10 @@ public class GameLogic implements PlayableLogic{
         for (Position flipPosition : lastFlippedDiscs) {
 
             Player originalOwner = (lastDisc.getOwner().equals(player1)) ? player2 : player1;
-            Disc originalDisc =  lastFlippedDiscs.remove(2);
+           Position lastFlippedDiscPosition = lastFlippedDiscs.remove(flipPosition);
+            Disc originalDisc = lastFlippedDiscPosition.getDisc(lastFlippedDiscPosition);
+            originalDisc.setOwner(originalOwner);
+
 
             board[flipPosition.row()][flipPosition.col()] = originalDisc;
 
