@@ -45,7 +45,7 @@ public class GameLogic implements PlayableLogic{
         isPlayer1Turn = true;
     }
 
-
+    //Meant to place the disc at the right position on the board.
     @Override
     public boolean locate_disc(Position position, Disc disc) {
         int row = position.row();
