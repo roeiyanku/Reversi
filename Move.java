@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+
 /**
  * The Move class represents a move in the game.
  */
@@ -8,7 +9,7 @@ public class Move {
     private Disc disc;
     private Player player;
     private Position position;
-    public List<Position> flippedDiscs;
+    public List<Move> flippedDiscs;
 
     public Move(Position position, Disc disc) {
         this.position = position;
@@ -17,7 +18,7 @@ public class Move {
 
 
 
-    public Move(Position position, Disc disc, Player player, List<Position> flippedDiscs) {
+    public Move(Position position, Disc disc, Player player, List<Move> flippedDiscs) {
         this.position = position;
         this.disc = disc;
         this.player = player;
@@ -34,11 +35,20 @@ public class Move {
     }
 
 
+    /**
+     * Getter for the disc.
+     *
+     * @return The disc associated with the move.
+     */
     public Disc getDisc() {
         return disc;
     }
-
-    public List<Position> getFlippedDisc() {
+    /**
+     * Getter for the list of flipped discs.
+     *
+     * @return A list of discs flipped as a result of this move.
+     */
+    public List<Move> getFlippedDisc() {
         return flippedDiscs;
     }
 
@@ -51,4 +61,4 @@ public class Move {
     }
 
 
-}
+
