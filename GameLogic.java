@@ -56,6 +56,23 @@ public class GameLogic implements PlayableLogic{
             return false;
         }
 
+
+        // Validate the number of special discs the player can place
+        if (disc instanceof BombDisc && disc.getOwner().getNumber_of_bombs() <= 0) {
+            System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
+                    " has no more Bomb Discs available.");
+            return false;
+        }
+
+        if (disc instanceof UnflippableDisc && disc.getOwner().getNumber_of_unflippedable() <= 0) {
+            System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
+                    " has no more Unflippable Discs available.");
+            return false;
+        }
+
+
+
+
         boolean validMove = false;
         List<Position> discsToFlip = new ArrayList<>();
 
@@ -425,6 +442,8 @@ public class GameLogic implements PlayableLogic{
         board[4][4] = new SimpleDisc(player1);
 
         moveHistory.clear();
+        player1.reset_bombs_and_unflippedable();
+        player2.reset_bombs_and_unflippedable();
 
         isPlayer1Turn = true;
     }
@@ -460,7 +479,7 @@ public class GameLogic implements PlayableLogic{
         for (Position flipPosition : lastFlippedDiscs) {
 
             Player originalOwner = (lastDisc.getOwner().equals(player1)) ? player2 : player1;
-            Disc originalDisc = new SimpleDisc(originalOwner);
+            Disc originalDisc =  lastFlippedDiscs.remove(2);
 
             board[flipPosition.row()][flipPosition.col()] = originalDisc;
 
