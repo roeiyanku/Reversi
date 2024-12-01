@@ -78,6 +78,10 @@ public class GameLogic implements PlayableLogic{
         //Tomer: Please add that:
         //if("disk is in the valid type of disk list"){
             board[row][col] = disc;
+            Player currentPlayer = isPlayer1Turn ? player1 : player2;
+            List<Position> flippedDiscs = new ArrayList<>();
+
+
         //}
 
         if(disc instanceof BombDisc){
@@ -105,17 +109,25 @@ public class GameLogic implements PlayableLogic{
                 continue;} //This makes the Unflippable Disk never be flipped.
 
             if(board[flipRow][flipCol] instanceof BombDisc){
-                board[flipRow][flipCol] = new BombDisc(disc.getOwner());}
+                board[flipRow][flipCol] = new BombDisc(disc.getOwner());
+                handleBombDisc(flipPosition);
+                flippedDiscs.addAll(handleBombDisc(flipPosition).getFlippedBombDiscs);
+                flippedDiscs.add(flipPosition);
+            }
 
-            board[flipRow][flipCol] = new SimpleDisc(disc.getOwner());
+            else {board[flipRow][flipCol] = new SimpleDisc(disc.getOwner());
+                flippedDiscs.add(flipPosition);
+            }
 
             System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
                     " flipped the " + disc.getType() + " in " + flipPosition.toString());
         }
         System.out.println();
 
+
         // saving the move in the history
-        moveHistory.push(new Move(position, disc));
+        Move newMove = new Move(position, disc, currentPlayer, flippedDiscs);
+        moveHistory.push(newMove);
 
 
         isPlayer1Turn = !isPlayer1Turn;
@@ -209,7 +221,7 @@ public class GameLogic implements PlayableLogic{
                 }
 
                 if ((currentDiscInDirection instanceof BombDisc)  && (!currentDiscInDirection.getOwner().equals(currentDisc.getOwner()))) {
-                    flips += handleBombDisc(new Position(currentRow, currentCol));
+                    flips += );
                     foundOpponent = true;
                 }
 
@@ -452,6 +464,14 @@ public class GameLogic implements PlayableLogic{
             System.out.printf("\tUndo: flipping back "+originalDisc.getType()+" in "+  flipPosition.toString());
         }
 
+        //making sure we add up the number of bombs and unflippables we undid
+        if (lastDisc instanceof BombDisc) {
+            lastDisc.getOwner().number_of_bombs++;}
+
+        if (lastDisc instanceof UnflippableDisc) {
+            lastDisc.getOwner().number_of_unflippedable++;
+        }
+
 
         // Turn back to the previous player
         isPlayer1Turn = !isPlayer1Turn;
@@ -462,6 +482,7 @@ public class GameLogic implements PlayableLogic{
 
 
     private int handleBombDisc(Position position) {
+        List<Position> flippedBombDiscs = new ArrayList<>();
         int flippedAroundBomb = 0;
 
         // All 8 directions around the bomb
@@ -476,6 +497,7 @@ public class GameLogic implements PlayableLogic{
         for (int[] dir : bombDirections) {
             int adjacentRow = position.row() + dir[0];
             int adjacentCol = position.col() + dir[1];
+            Position adjacentPosition = new Position(adjacentRow, adjacentCol);
 
             // Ensure the position is within bounds before accessing the board
             if (adjacentRow >= 0 && adjacentRow < BOARD_SIZE &&
@@ -489,8 +511,10 @@ public class GameLogic implements PlayableLogic{
                         currentDisc.getOwner() != currentPlayer) {
 
                     // Flip the owner of the opponent's disc
-                    currentDisc.setOwner(currentPlayer);
-                    board[adjacentRow][adjacentCol] = currentDisc;
+                    board[adjacentRow][adjacentCol].setOwner(currentPlayer);
+                    flippedBombDiscs.add(adjacentPosition);
+                    //הקטע זה שזה לא move אבל כן צריך לעשות לזה flip
+
 
                     // Increment the count of flipped discs
                     flippedAroundBomb++;
@@ -499,6 +523,16 @@ public class GameLogic implements PlayableLogic{
         }
 
         return flippedAroundBomb;
+
+
+        List<Position> getFlippedBombDiscs(){
+            return flippedBombDiscs;
+
+        }
+
+
+
+
     }
 
 }

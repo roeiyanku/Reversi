@@ -8,15 +8,14 @@ public class Move {
     private Disc disc;
     private Player player;
     private Position position;
-    private List<Position> flippedDiscs;
-    ;
+    public List<Position> flippedDiscs;
 
-
-    //base constructor
-    public Move(Position position) {
+    public Move(Position position, Disc disc) {
         this.position = position;
-        this.flippedDiscs = new ArrayList<>();
+        this.disc = disc;
     }
+
+
 
     public Move(Position position, Disc disc, Player player, List<Position> flippedDiscs) {
         this.position = position;
@@ -26,14 +25,7 @@ public class Move {
         this.flippedDiscs = (flippedDiscs != null) ? flippedDiscs : new ArrayList<>();
 
     }
-    public Move(Position position, Disc disc) {
-        this.position = position;
-        this.disc = disc;
-        this.flippedDiscs = new ArrayList<>();
 
-
-
-    }
     public Position position() {
         return this.position;
     }
