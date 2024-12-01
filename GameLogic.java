@@ -57,14 +57,10 @@ public class GameLogic implements PlayableLogic{
 
         // Validate the number of special discs the player can place
         if (disc instanceof BombDisc && disc.getOwner().getNumber_of_bombs() <= 0) {
-            System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
-                    " has no more Bomb Discs available.");
             return false; // Player has no Bomb Discs left.
         }
 
         if (disc instanceof UnflippableDisc && disc.getOwner().getNumber_of_unflippedable() <= 0) {
-            System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
-                    " has no more Unflippable Discs available.");
             return false; // Player has no Unflippable Discs left.
         }
 
@@ -117,8 +113,12 @@ public class GameLogic implements PlayableLogic{
             if (board[flipRow][flipCol] instanceof BombDisc) {
                 board[flipRow][flipCol] = new BombDisc(disc.getOwner()); // Replace with a Bomb Disc.
                 BombDiscResult result = handleBombDisc(flipPosition); // Handle the Bomb Disc effects.
+                handleBombDisc(flipPosition); //Activate the Bomb
 
                 List<Move> flippedBombDiscs = result.getFlippedBombDiscs(); // Get resulting flips.
+
+                //Add all flipped discs to history
+                flippedDiscs.add(new Move(flipPosition, new BombDisc(currentPlayer)));
                 flippedDiscs.addAll(flippedBombDiscs);
 
                 System.out.println("Player " + (disc.getOwner().equals(player1) ? "1" : "2") +
@@ -238,7 +238,7 @@ public class GameLogic implements PlayableLogic{
                 }
 
                 // regular disk count
-                //if the curent disc is of the opponent
+                //if the current disc is of the opponent
                 if (!currentDiscInDirection.getOwner().equals(currentDisc.getOwner())) {
                     foundOpponent = true;
                     flips++;
@@ -475,10 +475,15 @@ public class GameLogic implements PlayableLogic{
 
             Player originalOwner = (lastDisc.getOwner().equals(player1)) ? player2 : player1;
 
-            originalDisc.setOwner(originalOwner);
-
-
             board[originalPosition.row()][originalPosition.col()] = originalDisc;
+
+            board[originalPosition.row()][originalPosition.col()].setOwner(originalOwner);
+
+            if(originalDisc instanceof BombDisc){
+                board[originalPosition.row()][originalPosition.col()] = new BombDisc(originalOwner);
+            }
+
+
 
             System.out.println("\tUndo: flipping back "+originalDisc.getType()+" in "+  originalPosition.toString());
         }
@@ -497,6 +502,8 @@ public class GameLogic implements PlayableLogic{
 
         System.out.println();
     }
+
+    //We created a mini class called BombDiscResult to have the list of discs and also the number of discs flipped.
 
     public class BombDiscResult {
         private int flippedCount;
@@ -574,7 +581,7 @@ public class GameLogic implements PlayableLogic{
 
 
     private int countFlippedBombDiscs(Position position) {
-        int flippedAroundBomb = 0;
+        int flippedAroundBomb = 1; //starting with the bomb itself
 
         // Determine the current player
         Player currentPlayer = isPlayer1Turn ? player1 : player2;
