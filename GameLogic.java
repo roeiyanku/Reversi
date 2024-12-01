@@ -110,8 +110,10 @@ public class GameLogic implements PlayableLogic{
 
             if(board[flipRow][flipCol] instanceof BombDisc){
                 board[flipRow][flipCol] = new BombDisc(disc.getOwner());
-                handleBombDisc(flipPosition);
-                flippedDiscs.addAll(handleBombDisc(flipPosition).getFlippedBombDiscs);
+                BombDiscResult result =handleBombDisc(flipPosition);
+              //  int flippedCount = result.getFlippedCount();
+                List<Position> flippedBombDiscs = result.getFlippedBombDiscs();
+                flippedDiscs.addAll(flippedBombDiscs);
                 flippedDiscs.add(flipPosition);
             }
 
@@ -207,6 +209,7 @@ public class GameLogic implements PlayableLogic{
             while (currentRow >= 0 && currentRow < BOARD_SIZE &&
                     currentCol >= 0 && currentCol < BOARD_SIZE) {
                 Disc currentDiscInDirection = board[currentRow][currentCol];
+                Position currentPosition = new Position(currentRow, currentCol);
 
                 // if the position is empty then null
                 if (currentDiscInDirection == null) {
@@ -479,9 +482,28 @@ public class GameLogic implements PlayableLogic{
         System.out.println();
     }
 
+    public class BombDiscResult {
+        private int flippedCount;
+        private List<Position> flippedBombDiscs;
+
+        public BombDiscResult(int flippedCount, List<Position> flippedBombDiscs) {
+            this.flippedCount = flippedCount;
+            this.flippedBombDiscs = flippedBombDiscs;
+        }
+
+        public int getFlippedCount() {
+            return flippedCount;
+        }
+
+        public List<Position> getFlippedBombDiscs() {
+            return flippedBombDiscs;
+        }
+    }
 
 
-    private int handleBombDisc(Position position) {
+
+
+    private BombDiscResult handleBombDisc(Position position) {
         List<Position> flippedBombDiscs = new ArrayList<>();
         int flippedAroundBomb = 0;
 
@@ -513,8 +535,6 @@ public class GameLogic implements PlayableLogic{
                     // Flip the owner of the opponent's disc
                     board[adjacentRow][adjacentCol].setOwner(currentPlayer);
                     flippedBombDiscs.add(adjacentPosition);
-                    //הקטע זה שזה לא move אבל כן צריך לעשות לזה flip
-
 
                     // Increment the count of flipped discs
                     flippedAroundBomb++;
@@ -534,5 +554,36 @@ public class GameLogic implements PlayableLogic{
 
 
     }
+
+
+    private int countFlippedBombDiscs(Position position) {
+        int flippedAroundBomb = 0;
+
+        // Determine the current player
+        Player currentPlayer = isPlayer1Turn ? player1 : player2;
+
+        for (int[] dir : directions) {
+            int adjacentRow = position.row() + dir[0];
+            int adjacentCol = position.col() + dir[1];
+
+            // Ensure the position is within bounds before accessing the board
+            if (adjacentRow >= 0 && adjacentRow < BOARD_SIZE &&
+                    adjacentCol >= 0 && adjacentCol < BOARD_SIZE) {
+
+                Disc currentDisc = board[adjacentRow][adjacentCol];
+
+                // Check if the disc is valid for flipping and belongs to the opponent
+                if (currentDisc != null &&
+                        !(currentDisc instanceof UnflippableDisc) &&
+                        currentDisc.getOwner() != currentPlayer) {
+
+                    flippedAroundBomb++; // Count the flipped disc
+                }
+            }
+        }
+
+        return flippedAroundBomb;
+    }
+
 
 }
