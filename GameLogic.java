@@ -502,7 +502,7 @@ public class GameLogic implements PlayableLogic{
 
 
 
-
+    //Creating a new class for bombs.
     private BombDiscResult handleBombDisc(Position position) {
         List<Position> flippedBombDiscs = new ArrayList<>();
         int flippedAroundBomb = 0;
